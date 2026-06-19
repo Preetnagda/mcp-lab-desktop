@@ -1,34 +1,23 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { useState } from 'react'
+import Header from './components/Header'
+import Dashboard from './pages/Dashboard'
+import Server from './pages/Server'
+import { Server as ServerInterface } from 'src/shared/models'
+import { NavigationProvider, Page } from './navigation'
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const [currentPage, setCurrentPage] = useState<Page>({ page: 'dashboard', args: undefined })
 
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
+    <NavigationProvider value={setCurrentPage}>
+      <div className="bg-gray-700 text-white min-h-screen p-2">
+        <Header currentPage={currentPage} />
+        <div className="p-4">
+          {currentPage.page == 'dashboard' && <Dashboard />}
+          {currentPage.page == 'server' && <Server server={currentPage.args as ServerInterface} />}
         </div>
       </div>
-      <Versions></Versions>
-    </>
+    </NavigationProvider>
   )
 }
 
