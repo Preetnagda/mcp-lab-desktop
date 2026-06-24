@@ -1,8 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { getServers, getTools } from './api'
+import { getClient, storeClient } from './storage/session-store'
+import { getServer } from './storage/mcp-servers-store'
+
+export const callBackSessionPartition = 'persist:callback-session'
 
 function createWindow(): void {
   // Create the browser window.
@@ -13,7 +17,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false
     }
   })
@@ -54,6 +58,28 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('tools:list', (_, serverId: number) => getTools(serverId))
   ipcMain.handle('servers:list', () => getServers())
+
+  protocol.handle('mcp-lab', async (request: Request): Promise<Response> => {
+    const requestUrl = new URL(request.url)
+    const serverId = Number(requestUrl.searchParams.get('state') ?? 0)
+    const authCode = requestUrl.searchParams.get('code') ?? ''
+    const server = getServer(serverId)
+    const client = getClient(serverId)
+    let status = 200
+    if (!client || !server) {
+      status = 400
+    } else {
+      const connected = await client.connectToServer(server, authCode)
+      if (connected.connected == true) {
+        storeClient(serverId, client)
+      } else {
+        status = 401
+      }
+    }
+    return new Response('OK' + status.toString(), {
+      status
+    })
+  })
 
   createWindow()
 

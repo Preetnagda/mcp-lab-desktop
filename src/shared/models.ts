@@ -1,5 +1,13 @@
-import { StdioServerParameters } from '@modelcontextprotocol/sdk/client/stdio.js'
-import { StreamableHTTPClientTransportOptions } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import {
+  StdioServerParameters,
+  StreamableHTTPClientTransportOptions
+} from '@modelcontextprotocol/client'
+
+export interface ApiResponse<T> {
+  error: boolean
+  data: T
+  message?: string
+}
 
 export type TransportConfig =
   | { type: 'HTTP'; options: StreamableHTTPClientTransportOptions }

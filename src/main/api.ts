@@ -1,27 +1,42 @@
-import { Server, Tool } from '../shared/models'
-import { getServer, getServers as getServersFromDb } from './db'
+import { ApiResponse, Server, Tool } from '../shared/models'
+import { getServer, getServers as getServersFromDb } from './storage/mcp-servers-store'
 import { MCPClient } from './mcp/client'
-import { getClient, storeClient } from './session-store'
+import { getClient, storeClient } from './storage/session-store'
 
-export async function getServers(): Promise<Server[]> {
-  return getServersFromDb()
+export async function getServers(): Promise<ApiResponse<Server[]>> {
+  return {
+    error: false,
+    data: getServersFromDb()
+  }
 }
 
-export async function getTools(serverId: number): Promise<Tool[] | null> {
+export async function getTools(serverId: number): Promise<ApiResponse<Tool[]>> {
+  const response: ApiResponse<Tool[]> = {
+    error: false,
+    data: []
+  }
   let client = getClient(serverId)
-  if (!client) {
-    const server = getServer(serverId)
-    if (!server) return null
-    client = new MCPClient()
-    const connected = await client.connectToServer(server)
-    if (connected.code != 200) {
-      if (connected.code == 401) {
-        //TODO: Perform OAuth flow
-      }
-      return null
+  const server = getServer(serverId)
+  if (!server)
+    return {
+      error: true,
+      data: [],
+      message: 'Server not found'
     }
+  if (!client) {
+    client = new MCPClient()
+  }
+  if (!client.connected) {
+    const connected = await client.connectToServer(server)
     storeClient(serverId, client)
+    response.error = connected.connected
+    if (connected.authPending) {
+      response.message = 'Pending OAuth Flow'
+    }
+  }
+  if (!response.error) {
+    response.data = (await client.listTools()) ?? []
   }
 
-  return await client.listTools()
+  return response
 }

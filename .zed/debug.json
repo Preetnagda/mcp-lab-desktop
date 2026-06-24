@@ -1,0 +1,23 @@
+[
+  {
+    "label": "Debug Main Process",
+    "adapter": "JavaScript",
+    "type": "node",
+    "request": "launch",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "program": "$ZED_WORKTREE_ROOT/node_modules/.bin/electron-vite",
+    "args": ["dev", "--sourcemap"],
+    "env": {
+      "REMOTE_DEBUGGING_PORT": "9222"
+    }
+  },
+  {
+    "label": "Debug Renderer Process",
+    "adapter": "JavaScript",
+    "type": "chrome",
+    "request": "attach",
+    "port": 9222,
+    "timeout": 30000,
+    "webRoot": "$ZED_WORKTREE_ROOT/src/renderer"
+  }
+]

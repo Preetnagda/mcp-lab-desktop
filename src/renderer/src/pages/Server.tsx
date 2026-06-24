@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Tool, Server as ServerInterface } from 'src/shared/models'
 
 interface ServerProps {
@@ -8,11 +8,11 @@ export default function Server({ server }: ServerProps): React.JSX.Element {
   const [tools, setTools] = useState<Tool[]>([])
   const [error, setError] = useState<string>('')
   const handleConnect = (): void => {
-    window.api.listTools(server.id).then((tools) => {
-      if (!tools) {
-        setError('Not connected')
+    window.api.listTools(server.id).then((response) => {
+      if (response.error) {
+        setError(response.message ?? 'Error loading tools')
       } else {
-        setTools(tools)
+        setTools(response.data)
       }
     })
   }

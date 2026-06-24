@@ -11,10 +11,12 @@ export default function ServerList({ serverList }: ServerListProps): React.JSX.E
     <div className="py-2">
       <table className="w-full border">
         <thead className="p-2">
-          <th className="text-left p-2">Server</th>
-          <th className="text-left">Transport</th>
-          <th className="text-left">Tools</th>
-          <th className="text-left">Added</th>
+          <tr>
+            <th className="text-left p-2">Server</th>
+            <th className="text-left">Transport</th>
+            <th className="text-left">Tools</th>
+            <th className="text-left">Added</th>
+          </tr>
         </thead>
         <tbody>
           {serverList.map((server) => {

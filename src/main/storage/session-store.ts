@@ -1,4 +1,4 @@
-import { MCPClient } from './mcp/client'
+import { MCPClient } from '../mcp/client'
 
 interface SessionStoreInterface {
   clients: {

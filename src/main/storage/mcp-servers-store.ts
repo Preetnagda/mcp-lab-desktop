@@ -1,6 +1,6 @@
-import { Server } from '../shared/models'
+import { Server } from '../../shared/models'
 
-const servers: { [serverId: number]: Server } = {
+const dbServers: { [serverId: number]: Server } = {
   1: {
     id: 1,
     name: 'Cloudflare Docs',
@@ -18,14 +18,23 @@ const servers: { [serverId: number]: Server } = {
       options: {}
     },
     url: 'https://mcp.notion.com/mcp'
+  },
+  3: {
+    id: 3,
+    name: 'Test MCP',
+    transportConfig: {
+      type: 'HTTP',
+      options: {}
+    },
+    url: 'http://localhost:3000'
   }
 }
 
 export function getServer(serverId: number): Server | null {
-  if (serverId in servers) return servers[serverId]
+  if (serverId in dbServers) return dbServers[serverId]
   return null
 }
 
 export function getServers(): Server[] {
-  return Object.values(servers)
+  return Object.values(dbServers)
 }

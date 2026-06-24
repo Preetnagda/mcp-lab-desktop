@@ -6,8 +6,8 @@ import { Server } from 'src/shared/models'
 export default function Dashboard(): React.JSX.Element {
   const [servers, setServers] = useState<Server[]>([])
   useEffect(() => {
-    window.api.getServers().then((servers) => {
-      setServers(servers)
+    window.api.getServers().then((response) => {
+      setServers(response.data)
     })
   }, [])
 
