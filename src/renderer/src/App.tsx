@@ -11,13 +11,13 @@ function App(): React.JSX.Element {
 
   return (
     <NavigationProvider value={setCurrentPage}>
-      <div className="bg-gray-700 text-white min-h-screen p-2">
+      <div className="flex h-screen flex-col bg-app text-ink">
         <Header currentPage={currentPage} />
-        <div className="p-4">
+        <main className="flex-1 overflow-auto px-7 py-6">
           {currentPage.page == 'dashboard' && <Dashboard />}
           {currentPage.page == 'server' && <Server server={currentPage.args as ServerInterface} />}
           {currentPage.page == 'register-server' && <RegisterServer />}
-        </div>
+        </main>
       </div>
     </NavigationProvider>
   )

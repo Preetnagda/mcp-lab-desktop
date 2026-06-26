@@ -16,8 +16,8 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    // titleBarStyle: 'hidden',
-    // titleBarOverlay: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
