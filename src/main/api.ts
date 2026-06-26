@@ -1,7 +1,8 @@
-import { ApiResponse, Server, Tool } from '../shared/models'
-import { getServer, getServers as getServersFromDb } from './storage/mcp-servers-store'
+import { ApiResponse, RegisterServer, Server, Tool, TransportConfig } from '../shared/models'
+import { getServer, getServers as getServersFromDb, writeServer } from './storage/mcp-servers-store'
 import { MCPClient } from './mcp/client'
 import { getAllClients, getClient, storeClient } from './storage/session-store'
+import { randomUUID } from 'node:crypto'
 
 export async function getServers(): Promise<ApiResponse<Server[]>> {
   console.log('Fetching servers')
@@ -46,5 +47,28 @@ export async function getTools(serverId: string): Promise<ApiResponse<Tool[]>> {
     response.data = (await client.listTools()) ?? []
   }
 
+  return response
+}
+
+export async function registerServer(server: RegisterServer): Promise<ApiResponse<string>> {
+  const response: ApiResponse<string> = {
+    error: true,
+    data: ''
+  }
+
+  const id = randomUUID()
+  const transportConfig: TransportConfig = {
+    type: 'HTTP',
+    options: {}
+  }
+
+  await writeServer({
+    id,
+    transportConfig,
+    name: server.name,
+    url: server.url
+  })
+  response.error = false
+  response.data = id
   return response
 }

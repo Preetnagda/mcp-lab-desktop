@@ -1,15 +1,17 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ipcRenderer } from 'electron/renderer'
-import { ApiResponse, Server, Tool } from '../shared/models'
+import { ApiResponse, RegisterServer, Server, Tool } from '../shared/models'
 export interface Api {
   listTools: (serverId: string) => Promise<ApiResponse<Tool[]>>
   getServers: () => Promise<ApiResponse<Server[]>>
+  registerServer: (server: RegisterServer) => Promise<ApiResponse<string>>
 }
 
 const api: Api = {
   getServers: () => ipcRenderer.invoke('servers:list'),
-  listTools: (serverId) => ipcRenderer.invoke('tools:list', serverId)
+  listTools: (serverId) => ipcRenderer.invoke('tools:list', serverId),
+  registerServer: (server) => ipcRenderer.invoke('servers:register', server)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

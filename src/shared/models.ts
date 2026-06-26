@@ -13,10 +13,17 @@ export type TransportConfig =
   | { type: 'HTTP'; options: StreamableHTTPClientTransportOptions }
   | { type: 'STDIO'; options: StdioServerParameters }
 
-export interface Server {
-  id: string
+export interface RawServer {
   name: string
   url: string
+}
+
+export interface RegisterServer extends RawServer {
+  type: 'HTTP' | 'STDIO'
+}
+
+export interface Server extends RawServer {
+  id: string
   transportConfig: TransportConfig
   toolCount?: number
   connected?: boolean
@@ -24,7 +31,6 @@ export interface Server {
 
 export interface ConnectedServer extends Server {
   tools: unknown
-  description: unknown
 }
 
 export interface Tool {

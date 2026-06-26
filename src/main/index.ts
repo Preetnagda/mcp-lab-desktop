@@ -2,9 +2,10 @@ import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { getServers, getTools } from './api'
+import { getServers, getTools, registerServer } from './api'
 import { getClient, storeClient } from './storage/session-store'
 import { getServer } from './storage/mcp-servers-store'
+import { RegisterServer } from '../shared/models'
 
 export const callBackSessionPartition = 'persist:callback-session'
 
@@ -15,6 +16,8 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    // titleBarStyle: 'hidden',
+    // titleBarOverlay: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
@@ -58,6 +61,7 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('tools:list', (_, serverId: string) => getTools(serverId))
   ipcMain.handle('servers:list', () => getServers())
+  ipcMain.handle('servers:register', (_, server: RegisterServer) => registerServer(server))
 
   protocol.handle('mcp-lab', async (request: Request): Promise<Response> => {
     const requestUrl = new URL(request.url)

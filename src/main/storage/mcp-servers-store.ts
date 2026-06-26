@@ -1,40 +1,34 @@
 import { Server } from '../../shared/models'
+import { getFileData, writeFileData } from './file-storage-layer'
 
-const dbServers: { [serverId: number]: Server } = {
-  '1': {
-    id: '1',
-    name: 'Cloudflare Docs',
-    transportConfig: {
-      type: 'HTTP',
-      options: {}
-    },
-    url: 'https://docs.mcp.cloudflare.com/mcp'
-  },
-  '2': {
-    id: '2',
-    name: 'Notion MCP',
-    transportConfig: {
-      type: 'HTTP',
-      options: {}
-    },
-    url: 'https://mcp.notion.com/mcp'
-  },
-  '3': {
-    id: '3',
-    name: 'Test MCP',
-    transportConfig: {
-      type: 'HTTP',
-      options: {}
-    },
-    url: 'http://localhost:3000'
-  }
-}
+const SERVERS_FILENAME = 'server-store.json'
 
 export function getServer(serverId: string): Server | null {
-  if (serverId in dbServers) return dbServers[serverId]
+  const rawServers = getFileData(SERVERS_FILENAME)
+  if (rawServers) {
+    const servers = JSON.parse(rawServers)
+    if (serverId in servers) return servers[serverId]
+  }
   return null
 }
 
 export function getServers(): Server[] {
-  return Object.values(dbServers)
+  let servers = []
+  const rawServers = getFileData(SERVERS_FILENAME)
+  if (rawServers) {
+    servers = JSON.parse(rawServers)
+  }
+  return Object.values(servers)
+}
+
+export async function writeServer(server: Server): Promise<void> {
+  const rawServers = getFileData(SERVERS_FILENAME)
+  const servers = rawServers ? JSON.parse(rawServers) : {}
+  servers[server.id] = {
+    id: server.id,
+    name: server.name,
+    transportConfig: server.transportConfig,
+    url: server.url
+  }
+  await writeFileData(JSON.stringify(servers), SERVERS_FILENAME)
 }

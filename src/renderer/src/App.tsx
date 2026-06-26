@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import Server from './pages/Server'
 import { Server as ServerInterface } from 'src/shared/models'
 import { NavigationProvider, Page } from './navigation'
+import RegisterServer from './pages/RegisterServer'
 
 function App(): React.JSX.Element {
   const [currentPage, setCurrentPage] = useState<Page>({ page: 'dashboard', args: undefined })
@@ -15,6 +16,7 @@ function App(): React.JSX.Element {
         <div className="p-4">
           {currentPage.page == 'dashboard' && <Dashboard />}
           {currentPage.page == 'server' && <Server server={currentPage.args as ServerInterface} />}
+          {currentPage.page == 'register-server' && <RegisterServer />}
         </div>
       </div>
     </NavigationProvider>
