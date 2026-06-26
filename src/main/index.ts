@@ -56,12 +56,12 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-  ipcMain.handle('tools:list', (_, serverId: number) => getTools(serverId))
+  ipcMain.handle('tools:list', (_, serverId: string) => getTools(serverId))
   ipcMain.handle('servers:list', () => getServers())
 
   protocol.handle('mcp-lab', async (request: Request): Promise<Response> => {
     const requestUrl = new URL(request.url)
-    const serverId = Number(requestUrl.searchParams.get('state') ?? 0)
+    const serverId = requestUrl.searchParams.get('state') ?? ''
     const authCode = requestUrl.searchParams.get('code') ?? ''
     const server = getServer(serverId)
     const client = getClient(serverId)

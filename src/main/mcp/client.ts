@@ -22,6 +22,7 @@ export class MCPClient {
   private client: Client
   private authProvider?: OAuthClientProvider
   private _connected: boolean
+  private _tools?: Tool[]
 
   constructor() {
     this.client = new Client({
@@ -39,13 +40,25 @@ export class MCPClient {
     return this.client
   }
 
-  async listTools(): Promise<Tool[] | null> {
+  get toolCount(): number | undefined {
+    return this._tools?.length
+  }
+
+  async listTools(): Promise<Tool[] | undefined> {
+    if (!this._tools) {
+      await this.refreshTools()
+    }
+    return this._tools
+  }
+
+  async refreshTools(): Promise<Tool[] | undefined> {
     const tools = await this.client.listTools()
-    return tools.tools.map((tool) => ({
+    this._tools = tools.tools.map((tool) => ({
       name: tool.name,
       description: tool.description ?? '',
       inputSchema: tool.inputSchema
     }))
+    return this._tools
   }
 
   async connectToServer(server: Server, authCode?: string): Promise<ConnectionResponse> {

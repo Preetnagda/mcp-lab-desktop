@@ -1,8 +1,8 @@
 import { Server } from '../../shared/models'
 
 const dbServers: { [serverId: number]: Server } = {
-  1: {
-    id: 1,
+  '1': {
+    id: '1',
     name: 'Cloudflare Docs',
     transportConfig: {
       type: 'HTTP',
@@ -10,8 +10,8 @@ const dbServers: { [serverId: number]: Server } = {
     },
     url: 'https://docs.mcp.cloudflare.com/mcp'
   },
-  2: {
-    id: 2,
+  '2': {
+    id: '2',
     name: 'Notion MCP',
     transportConfig: {
       type: 'HTTP',
@@ -19,8 +19,8 @@ const dbServers: { [serverId: number]: Server } = {
     },
     url: 'https://mcp.notion.com/mcp'
   },
-  3: {
-    id: 3,
+  '3': {
+    id: '3',
     name: 'Test MCP',
     transportConfig: {
       type: 'HTTP',
@@ -30,7 +30,7 @@ const dbServers: { [serverId: number]: Server } = {
   }
 }
 
-export function getServer(serverId: number): Server | null {
+export function getServer(serverId: string): Server | null {
   if (serverId in dbServers) return dbServers[serverId]
   return null
 }

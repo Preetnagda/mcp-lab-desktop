@@ -14,10 +14,12 @@ export type TransportConfig =
   | { type: 'STDIO'; options: StdioServerParameters }
 
 export interface Server {
-  id: number
+  id: string
   name: string
   url: string
   transportConfig: TransportConfig
+  toolCount?: number
+  connected?: boolean
 }
 
 export interface ConnectedServer extends Server {

@@ -4,10 +4,15 @@ import {
   OAuthClientProvider,
   OAuthTokens
 } from '@modelcontextprotocol/client'
-import { getClientCredentials, storeClientCredentials } from '../storage/client-store'
+import {
+  getClientCredentials,
+  getToken,
+  storeClientCredentials,
+  storeToken
+} from '../storage/credential-store'
 
 export default class CustomOAuthProvider implements OAuthClientProvider {
-  // private _clientInformation?: OAuthClientInformationMixed
+  private _clientInformation?: OAuthClientInformationMixed
   private _tokens?: OAuthTokens
   private _codeVerifier?: string
 
@@ -27,18 +32,14 @@ export default class CustomOAuthProvider implements OAuthClientProvider {
     return this._clientMetadata
   }
 
-  // -- DCR --
-
-  //TODO: Fetch from db, and decrypt with safeStorage
   clientInformation(): OAuthClientInformationMixed | undefined {
-    return getClientCredentials(this.serverUrl)
+    return this._clientInformation ?? getClientCredentials(this.serverUrl)
   }
 
   saveClientInformation(clientInformation: OAuthClientInformationMixed): Promise<void> {
+    this._clientInformation = clientInformation
     return storeClientCredentials(this.serverUrl, clientInformation)
   }
-
-  // --
 
   codeVerifier(): string {
     return this._codeVerifier ?? ''
@@ -57,10 +58,11 @@ export default class CustomOAuthProvider implements OAuthClientProvider {
   }
 
   tokens(): OAuthTokens | undefined | Promise<OAuthTokens | undefined> {
-    return this._tokens
+    return this._tokens ?? getToken(this.serverUrl)
   }
-  //TODO: Where to save these?
-  saveTokens(tokens: OAuthTokens): void {
+
+  async saveTokens(tokens: OAuthTokens): Promise<void> {
     this._tokens = tokens
+    await storeToken(this.serverUrl, tokens)
   }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Tool, Server as ServerInterface } from 'src/shared/models'
 
 interface ServerProps {
@@ -7,7 +7,7 @@ interface ServerProps {
 export default function Server({ server }: ServerProps): React.JSX.Element {
   const [tools, setTools] = useState<Tool[]>([])
   const [error, setError] = useState<string>('')
-  const handleConnect = (): void => {
+  const handleConnect = useCallback((): void => {
     window.api.listTools(server.id).then((response) => {
       if (response.error) {
         setError(response.message ?? 'Error loading tools')
@@ -15,7 +15,12 @@ export default function Server({ server }: ServerProps): React.JSX.Element {
         setTools(response.data)
       }
     })
-  }
+  }, [server.id])
+  useEffect(() => {
+    if (server.connected) {
+      handleConnect()
+    }
+  }, [server.connected, handleConnect])
   return (
     <div>
       <div>

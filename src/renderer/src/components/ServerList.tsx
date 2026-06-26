@@ -15,7 +15,7 @@ export default function ServerList({ serverList }: ServerListProps): React.JSX.E
             <th className="text-left p-2">Server</th>
             <th className="text-left">Transport</th>
             <th className="text-left">Tools</th>
-            <th className="text-left">Added</th>
+            <th className="text-left">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -40,8 +40,8 @@ export default function ServerList({ serverList }: ServerListProps): React.JSX.E
                   </div>
                 </td>
                 <td>{server.transportConfig.type}</td>
-                <td>8</td>
-                <td>Today</td>
+                <td>{server.toolCount ?? 'N/A'}</td>
+                <td>{server.connected ? 'Connected' : 'Non Connected'}</td>
               </tr>
             )
           })}

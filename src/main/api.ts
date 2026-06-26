@@ -1,16 +1,24 @@
 import { ApiResponse, Server, Tool } from '../shared/models'
 import { getServer, getServers as getServersFromDb } from './storage/mcp-servers-store'
 import { MCPClient } from './mcp/client'
-import { getClient, storeClient } from './storage/session-store'
+import { getAllClients, getClient, storeClient } from './storage/session-store'
 
 export async function getServers(): Promise<ApiResponse<Server[]>> {
+  console.log('Fetching servers')
+  const allClients = getAllClients()
   return {
     error: false,
-    data: getServersFromDb()
+    data: getServersFromDb().map((server) => {
+      return {
+        ...server,
+        toolCount: allClients[server.id]?.toolCount,
+        connected: allClients[server.id]?.connected
+      }
+    })
   }
 }
 
-export async function getTools(serverId: number): Promise<ApiResponse<Tool[]>> {
+export async function getTools(serverId: string): Promise<ApiResponse<Tool[]>> {
   const response: ApiResponse<Tool[]> = {
     error: false,
     data: []
