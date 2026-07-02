@@ -3,11 +3,7 @@ import {
   StreamableHTTPClientTransportOptions
 } from '@modelcontextprotocol/client'
 
-export interface ApiResponse<T> {
-  error: boolean
-  data: T
-  message?: string
-}
+export type ApiResponse<T> = { ok: true; data: T } | { ok: false; message: string }
 
 export type TransportConfig =
   | { type: 'HTTP'; options: StreamableHTTPClientTransportOptions }
@@ -27,10 +23,6 @@ export interface Server extends RawServer {
   transportConfig: TransportConfig
   toolCount?: number
   connected?: boolean
-}
-
-export interface ConnectedServer extends Server {
-  tools: unknown
 }
 
 export interface Tool {

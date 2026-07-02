@@ -10,6 +10,7 @@ import {
   storeClientCredentials,
   storeToken
 } from '../storage/credential-store'
+import { createAuthFlow } from './auth-flows'
 
 export default class CustomOAuthProvider implements OAuthClientProvider {
   private _clientInformation?: OAuthClientInformationMixed
@@ -19,9 +20,9 @@ export default class CustomOAuthProvider implements OAuthClientProvider {
   constructor(
     private _redirectUrl: string,
     private _clientMetadata: OAuthClientMetadata,
-    private _redirectAction: CallableFunction,
+    private _redirectAction: (authorizationUrl: URL) => void,
     private serverUrl: string,
-    private _state: string
+    private serverId: string
   ) {}
 
   get redirectUrl(): string {
@@ -42,15 +43,20 @@ export default class CustomOAuthProvider implements OAuthClientProvider {
   }
 
   codeVerifier(): string {
-    return this._codeVerifier ?? ''
+    if (!this._codeVerifier) {
+      throw new Error('No PKCE code verifier saved for this authorization flow')
+    }
+    return this._codeVerifier
   }
 
   saveCodeVerifier(codeVerifier: string): void {
     this._codeVerifier = codeVerifier
   }
 
-  state(): string | Promise<string> {
-    return this._state
+  state(): string {
+    // Fresh single-use nonce per authorization attempt; the callback handler
+    // resolves it back to the server via consumeAuthFlow.
+    return createAuthFlow(this.serverId)
   }
 
   redirectToAuthorization(authorizationUrl: URL): void | Promise<void> {

@@ -32,7 +32,7 @@ async function storeCredential(
   fileName: string
 ): Promise<void> {
   if (!safeStorage.isEncryptionAvailable()) {
-    throw new Error('Unable to store credenitals. Encryption method unavailable')
+    throw new Error('Unable to store credentials. Encryption method unavailable')
   }
   const encryptedCredentials = safeStorage.encryptString(JSON.stringify(credential))
   const allClientCredentials = JSON.parse(getFileData(fileName) ?? '{}')
@@ -42,7 +42,7 @@ async function storeCredential(
 
 function getCredential(serverUrl: string, fileName: string): unknown | undefined {
   if (!safeStorage.isEncryptionAvailable()) {
-    throw new Error('Unable to get credenitals. Encryption method unavailable')
+    throw new Error('Unable to get credentials. Encryption method unavailable')
   }
   const allClientCredentials = JSON.parse(getFileData(fileName) ?? '{}')
   const clientCredentials = allClientCredentials[serverUrl]

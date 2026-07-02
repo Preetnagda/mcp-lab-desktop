@@ -10,12 +10,15 @@ import {
 import { Server, Tool } from '../../shared/models'
 import CustomOAuthProvider from './OAuthProvider'
 import { BrowserWindow } from 'electron'
+import { CALLBACK_SESSION_PARTITION } from '../constants'
+import { attachAuthWindow } from './auth-flows'
 
 const CALLBACK_URL = 'mcp-lab://auth'
 
 interface ConnectionResponse {
   connected: boolean
   authPending: boolean
+  message?: string
 }
 
 export class MCPClient {
@@ -66,14 +69,14 @@ export class MCPClient {
       this.authProvider = this.resolveAuthProvider(server)
     }
     const transport = this.resolveTransport(server, this.authProvider)
-    if (authCode && server.transportConfig.type == 'HTTP') {
-      await (transport as StreamableHTTPClientTransport).finishAuth(authCode)
-    }
     const response: ConnectionResponse = {
       connected: false,
       authPending: false
     }
     try {
+      if (authCode && server.transportConfig.type == 'HTTP') {
+        await (transport as StreamableHTTPClientTransport).finishAuth(authCode)
+      }
       await this.client.connect(transport)
       this._connected = true
       response.connected = true
@@ -82,6 +85,8 @@ export class MCPClient {
       if (error instanceof UnauthorizedError) {
         this._connected = false
         response.authPending = true
+      } else {
+        response.message = error instanceof Error ? error.message : String(error)
       }
     }
     return response
@@ -98,11 +103,20 @@ export class MCPClient {
       CALLBACK_URL,
       clientMetadata,
       (authorizationUrl: URL) => {
-        const oAuthWindow = new BrowserWindow()
+        // Isolated session: keeps IdP cookies out of the app session and is the
+        // session the mcp-lab:// callback protocol handler is registered on.
+        const oAuthWindow = new BrowserWindow({
+          webPreferences: {
+            partition: CALLBACK_SESSION_PARTITION,
+            sandbox: true
+          }
+        })
+        const state = authorizationUrl.searchParams.get('state')
+        if (state) attachAuthWindow(state, oAuthWindow)
         oAuthWindow.loadURL(authorizationUrl.href)
       },
       server.url,
-      server.id.toString()
+      server.id
     )
 
     return authProvider

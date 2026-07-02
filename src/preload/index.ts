@@ -5,13 +5,23 @@ import { ApiResponse, RegisterServer, Server, Tool } from '../shared/models'
 export interface Api {
   listTools: (serverId: string) => Promise<ApiResponse<Tool[]>>
   getServers: () => Promise<ApiResponse<Server[]>>
+  getServer: (serverId: string) => Promise<ApiResponse<Server>>
   registerServer: (server: RegisterServer) => Promise<ApiResponse<string>>
+  onServersUpdated: (callback: () => void) => () => void
 }
 
 const api: Api = {
   getServers: () => ipcRenderer.invoke('servers:list'),
+  getServer: (serverId) => ipcRenderer.invoke('servers:get', serverId),
   listTools: (serverId) => ipcRenderer.invoke('tools:list', serverId),
-  registerServer: (server) => ipcRenderer.invoke('servers:register', server)
+  registerServer: (server) => ipcRenderer.invoke('servers:register', server),
+  onServersUpdated: (callback) => {
+    const listener = (): void => callback()
+    ipcRenderer.on('servers:updated', listener)
+    return () => {
+      ipcRenderer.removeListener('servers:updated', listener)
+    }
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

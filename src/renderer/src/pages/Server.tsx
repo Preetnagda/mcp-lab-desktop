@@ -2,31 +2,60 @@ import { useCallback, useEffect, useState } from 'react'
 import { Tool, Server as ServerInterface } from 'src/shared/models'
 
 interface ServerProps {
-  server: ServerInterface
+  serverId: string
 }
 
-export default function Server({ server }: ServerProps): React.JSX.Element {
+export default function Server({ serverId }: ServerProps): React.JSX.Element {
+  const [server, setServer] = useState<ServerInterface | null>(null)
   const [tools, setTools] = useState<Tool[]>([])
   const [error, setError] = useState<string>('')
   const [selected, setSelected] = useState<string | null>(null)
 
+  const refreshServer = useCallback((): void => {
+    window.api
+      .getServer(serverId)
+      .then((response) => {
+        if (response.ok) {
+          setServer(response.data)
+        } else {
+          setError(response.message)
+        }
+      })
+      .catch(() => setError('Failed to load server'))
+  }, [serverId])
+
   const handleConnect = useCallback((): void => {
-    window.api.listTools(server.id).then((response) => {
-      if (response.error) {
-        setError(response.message ?? 'Error loading tools')
-      } else {
+    window.api
+      .listTools(serverId)
+      .then((response) => {
+        if (!response.ok) {
+          setError(response.message)
+          return
+        }
         setError('')
         setTools(response.data)
         setSelected((prev) => prev ?? response.data[0]?.name ?? null)
-      }
-    })
-  }, [server.id])
+        refreshServer()
+      })
+      .catch(() => setError('Failed to load tools'))
+  }, [serverId, refreshServer])
+
+  // Fetch on mount and re-fetch when main pushes a state change
+  // (e.g. OAuth flow completed); the subscription return is the cleanup.
+  useEffect(() => {
+    refreshServer()
+    return window.api.onServersUpdated(refreshServer)
+  }, [refreshServer])
 
   useEffect(() => {
-    if (server.connected) handleConnect()
-  }, [server.connected, handleConnect])
+    if (server?.connected) handleConnect()
+  }, [server?.connected, handleConnect])
 
   const selectedTool = tools.find((tool) => tool.name === selected) ?? null
+
+  if (!server) {
+    return <div className="p-4.5 text-[13px] text-muted-2">{error || 'Loading server…'}</div>
+  }
 
   return (
     <div>

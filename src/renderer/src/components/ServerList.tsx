@@ -58,7 +58,7 @@ export default function ServerList({ serverList }: ServerListProps): React.JSX.E
               onClick={() =>
                 navigate({
                   page: 'server',
-                  args: server,
+                  args: server.id,
                   title: server.name,
                   backPage: 'dashboard'
                 })

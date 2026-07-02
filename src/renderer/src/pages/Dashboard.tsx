@@ -1,20 +1,36 @@
 import Filters from '@renderer/components/Filters'
 import ServerList from '@renderer/components/ServerList'
 import { useNavigate } from '@renderer/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Server } from 'src/shared/models'
 
 export default function Dashboard(): React.JSX.Element {
   const [servers, setServers] = useState<Server[]>([])
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [transport, setTransport] = useState('all')
   const navigate = useNavigate()
 
-  useEffect(() => {
-    window.api.getServers().then((response) => {
-      setServers(response.data)
-    })
+  const loadServers = useCallback((): void => {
+    window.api
+      .getServers()
+      .then((response) => {
+        if (response.ok) {
+          setError('')
+          setServers(response.data)
+        } else {
+          setError(response.message)
+        }
+      })
+      .catch(() => setError('Failed to load servers'))
   }, [])
+
+  // Fetch on mount and re-fetch when main pushes a state change
+  // (e.g. OAuth flow completed); the subscription return is the cleanup.
+  useEffect(() => {
+    loadServers()
+    return window.api.onServersUpdated(loadServers)
+  }, [loadServers])
 
   const transports = useMemo(
     () => Array.from(new Set(servers.map((server) => server.transportConfig.type))),
@@ -53,6 +69,12 @@ export default function Dashboard(): React.JSX.Element {
           + Register server
         </button>
       </div>
+
+      {error && (
+        <div className="mb-4 rounded-lg border border-line-strong bg-surface px-4 py-3 text-[13px] text-warn-text">
+          {error}
+        </div>
+      )}
 
       <div className="pt-4">
         <Filters
