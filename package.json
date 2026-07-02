@@ -1,8 +1,10 @@
 {
   "name": "mcp-lab",
+  "productName": "MCP Lab",
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
+  "desktopName": "mcp-lab.desktop",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
   "type": "module",

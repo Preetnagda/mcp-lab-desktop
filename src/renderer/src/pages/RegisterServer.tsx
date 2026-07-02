@@ -38,8 +38,8 @@ export default function RegisterServer(): React.JSX.Element {
   }
 
   return (
-    <div className="mx-auto max-w-xl">
-      <div className="mb-5">
+    <div className="mx-auto w-full">
+      <div className="mb-5 pb-4">
         <h1 className="text-[22px] font-bold text-ink">Register a server</h1>
         <p className="mt-0.5 text-[13px] text-muted-2">Add a new MCP server to your registry.</p>
       </div>
@@ -48,7 +48,7 @@ export default function RegisterServer(): React.JSX.Element {
         onSubmit={handleSubmit}
         className="rounded-[10px] border border-line-strong bg-surface p-5"
       >
-        <div className="mb-5">
+        <div className="pb-5">
           <label htmlFor="name" className="mb-1.5 flex items-baseline gap-2">
             <span className="text-[13px] text-ink-2">Name</span>
             <span className="text-[10px] uppercase tracking-wider text-warn-text">required</span>
@@ -64,7 +64,7 @@ export default function RegisterServer(): React.JSX.Element {
           />
         </div>
 
-        <div className="mb-5">
+        <div className="pb-5">
           <label htmlFor="url" className="mb-1.5 flex items-baseline gap-2">
             <span className="text-[13px] text-ink-2">URL</span>
             <span className="text-[10px] uppercase tracking-wider text-warn-text">required</span>
@@ -80,7 +80,7 @@ export default function RegisterServer(): React.JSX.Element {
           />
         </div>
 
-        <div className="mb-6">
+        <div className="pb-6">
           <label htmlFor="transport" className="mb-1.5 block text-[13px] text-ink-2">
             Transport Type
           </label>
@@ -113,7 +113,7 @@ export default function RegisterServer(): React.JSX.Element {
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-accent-strong px-5 py-2.25 font-brand text-base text-white hover:brightness-110 disabled:opacity-60"
+            className="rounded-lg bg-accent-strong font-brand px-5 py-2.25 text-base text-black hover:brightness-110 disabled:opacity-60 hover:cursor-pointer"
           >
             {submitting ? 'Registering…' : 'Register server'}
           </button>

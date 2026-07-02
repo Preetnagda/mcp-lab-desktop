@@ -64,7 +64,7 @@ export default function Dashboard(): React.JSX.Element {
         </div>
         <button
           onClick={handleRegister}
-          className="rounded-lg bg-accent-strong px-4.5 py-2.5 font-brand text-base text-black hover:brightness-110"
+          className="rounded-lg bg-accent-strong px-4.5 py-2.5 font-brand text-base text-black hover:brightness-110 hover:cursor-pointer"
         >
           + Register server
         </button>
